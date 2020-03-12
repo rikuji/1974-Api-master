@@ -6,7 +6,7 @@ using FluentValidator.Validation;
 
 namespace BaltaStore.Domain.Commands.CustomerCommands.Inputs
 {
-    public class AddAddressCommand : ICommand
+    public class AddAddressCommand : Notifiable, ICommand
     {
         public Guid Id { get; set; }
         public string Street { get; set; }
@@ -21,7 +21,7 @@ namespace BaltaStore.Domain.Commands.CustomerCommands.Inputs
 
         public bool Valid()
         {
-            throw new System.NotImplementedException();
+            return IsValid;
         }
     }
 }
