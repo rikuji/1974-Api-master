@@ -1,11 +1,20 @@
 using BaltaStore.Domain.StoreContext.Enums;
+using BaltaStore.Shared.Entities;
+using FluentValidator;
 
-namespace BaltaStore.Domain.StoreContext.ValueObjects
+namespace BaltaStore.Domain.StoreContext.Entities
 {
-    public class Address
+    public class Address : Entity
     {
-
-        public Address(string street, string number, string complement, string district, string city, string state, string coutry, string zipCode, EAddressType type)
+        public Address(string street,
+            string number,
+            string complement,
+            string district,
+            string city,
+            string state,
+            string country,
+            string zipCode,
+            EAddressType type)
         {
             Street = street;
             Number = number;
@@ -13,19 +22,20 @@ namespace BaltaStore.Domain.StoreContext.ValueObjects
             District = district;
             City = city;
             State = state;
-            Coutry = coutry;
+            Country = country;
             ZipCode = zipCode;
             Type = type;
         }
-        public string Street { get; set; }
-        public string Number { get; set; }
-        public string Complement { get; set; }
-        public string District { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string Coutry { get; set; }
-        public string ZipCode { get; set; }
-        public EAddressType Type { get; set; }
+
+        public string Street { get; private set; }
+        public string Number { get; private set; }
+        public string Complement { get; private set; }
+        public string District { get; private set; }
+        public string City { get; private set; }
+        public string State { get; private set; }
+        public string Country { get; private set; }
+        public string ZipCode { get; private set; }
+        public EAddressType Type { get; private set; }
 
         public override string ToString()
         {
