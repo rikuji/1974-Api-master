@@ -1,6 +1,7 @@
 using System;
 using BaltaStore.Domain.Commands.CustomerCommands.Inputs;
 using BaltaStore.Domain.Commands.CustomerCommands.Outputs;
+using BaltaStore.Domain.StoreContext.Commands.CustomerCommands.Outputs;
 using BaltaStore.Domain.StoreContext.Entities;
 using BaltaStore.Domain.StoreContext.Repositories;
 using BaltaStore.Domain.StoreContext.Services;
@@ -26,12 +27,12 @@ namespace BaltaStore.Domain.StoreContext.Handlers
         {
             if (_repository.CheckDocument(command.Document))
             {
-                AddNotification("Document", "Este CPF já está em uso");
+                AddNotification("Document", "Este CPF jï¿½ estï¿½ em uso");
             }
 
             if (_repository.CheckEmail(command.Email))
             {
-                AddNotification("Email", "Este Email já está em uso");
+                AddNotification("Email", "Este Email jï¿½ estï¿½ em uso");
             }
 
             var name = new Name(command.FirstName, command.LastName);
@@ -47,14 +48,19 @@ namespace BaltaStore.Domain.StoreContext.Handlers
 
             if (Invalid)
             {
-                return null;
+                return new CommandResult(false, "Por favor corrija os campos abaixo", Notifications); ;
             }
 
             _repository.Save(customer);
 
             _emailService.Send(email.Address, "hello@balto.io", "Bem Vindo", "Seja bem vindo ao BaltaStore");
 
-            return new CreateCustomerCommandResult(customer.Id, name.ToString(), email.Address);
+            return new CommandResult(true, "Bem vindo ao BaltaStore", new
+            {
+                Id = customer.Id,
+                Name = name.ToString(),
+                Email = email.Address
+            });
         }
 
         public ICommandResult Handle(AddAddressCommand command)

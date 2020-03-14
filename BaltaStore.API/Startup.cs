@@ -1,4 +1,5 @@
-﻿using BaltaStore.Domain.StoreContext.Repositories;
+﻿using BaltaStore.Domain.StoreContext.Handlers;
+using BaltaStore.Domain.StoreContext.Repositories;
 using BaltaStore.Domain.StoreContext.Services;
 using BaltaStore.Infra.StoreContext.DataContexts;
 using BaltaStore.Infra.StoreContext.Repositories;
@@ -14,9 +15,12 @@ namespace BaltaStore.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddResponseCompression();
+
             services.AddScoped<BaltaDataContext, BaltaDataContext>();
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<CustomerHandler, CustomerHandler>();
 
         }
 
@@ -26,6 +30,7 @@ namespace BaltaStore.API
                 app.UseDeveloperExceptionPage();
 
             app.UseMvc();
+            app.UseResponseCompression();
         }
     }
 }

@@ -53,6 +53,14 @@ namespace BaltaStore.Infra.StoreContext.Repositories
                  .FirstOrDefault();
         }
 
+        public IEnumerable<ListCustomerQueryResult> Get()
+        {
+            return _context
+                .Connection
+                .Query<ListCustomerQueryResult>(
+                    "SELECT [Id],CONCAT([FirstName],' ', [LastName]) AS [Name] ,[Document],[Email] FROM [Customer]");
+        }
+
         public void Save(Customer customer)
         {
             _context.Connection.Execute("spCreateCustomer",
@@ -83,6 +91,24 @@ namespace BaltaStore.Infra.StoreContext.Repositories
                     Type = address.Type,
                 }, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        public GetCustomerQueryResult Get(Guid id)
+        {
+            return _context
+               .Connection
+               .Query<GetCustomerQueryResult>(
+                   "SELECT [Id],CONCAT([FirstName],' ', [LastName]) AS [Name],[Document],[Email] FROM [Customer] WHERE [Id] = @id",
+                   new { id = id })
+                   .FirstOrDefault();
+        }
+
+        public IEnumerable<ListCustomerOrdersQueryResult> GetOrders(Guid id)
+        {
+            return
+               _context
+               .Connection
+               .Query<ListCustomerOrdersQueryResult>("", new { id = id });
         }
     }
 }

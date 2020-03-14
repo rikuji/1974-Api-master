@@ -1,6 +1,11 @@
 ﻿using BaltaStore.Domain.Commands.CustomerCommands.Inputs;
+using BaltaStore.Domain.Commands.CustomerCommands.Outputs;
 using BaltaStore.Domain.StoreContext.Entities;
+using BaltaStore.Domain.StoreContext.Handlers;
+using BaltaStore.Domain.StoreContext.Queries;
+using BaltaStore.Domain.StoreContext.Repositories;
 using BaltaStore.Domain.StoreContext.ValueObjects;
+using BaltaStore.Shared.Commands;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,86 +16,43 @@ namespace BaltaStore.API.Controllers
 {
     public class CustomerController : Controller
     {
-        [HttpGet]
-        [Route("customers")]
-        public List<Customer> Get()
+        private readonly ICustomerRepository _customerRepository;
+        private readonly CustomerHandler _handler;
+
+        public CustomerController(ICustomerRepository customerRepository, CustomerHandler handler)
         {
-            var name = new Name("Lucas", "Valenzuela");
-            var document = new Document("03379401188");
-            var email = new Email("lucasbezerra@gmail.com");
-            var customer = new Customer(name, document, email, "5561993537517");
-            var customers = new List<Customer>();
-
-            customers.Add(customer);
-
-            return customers;
+            _customerRepository = customerRepository;
+            _handler = handler;
         }
 
         [HttpGet]
-        [Route("customers/{id}")]
-        public Customer GetById(Guid id)
+        [Route("v1/customers")]
+        [ResponseCache(Duration = 15)]
+        public IEnumerable<ListCustomerQueryResult> Get()
         {
-            var name = new Name("Lucas", "Valenzuela");
-            var document = new Document("03379401188");
-            var email = new Email("lucasbezerra@gmail.com");
-            var customer = new Customer(name, document, email, "5561993537517");
-
-            return customer;
+            return _customerRepository.Get();
         }
 
         [HttpGet]
-        [Route("customers/{id}/orders")]
-        public List<Order> GetOrders(Guid id)
+        [Route("v1/customers/{id}")]
+        public GetCustomerQueryResult GetById(Guid id)
         {
-            var name = new Name("Lucas", "Valenzuela");
-            var document = new Document("03379401188");
-            var email = new Email("lucasbezerra@gmail.com");
-            var customer = new Customer(name, document, email, "5561993537517");
-            var order = new Order(customer);
+            return _customerRepository.Get(id);
+        }
 
-            var mouse = new Product("Mouse", "Mouse", "Mouse.jpg", 100M, 10);
-            var monitor = new Product("Monitor", "Monitor", "Monitor.jpg", 100M, 10);
-
-            order.AddItem(monitor, 5);
-            order.AddItem(mouse, 5);
-
-            var orders = new List<Order>();
-            orders.Add(order);
-
-            return orders;
+        [HttpGet]
+        [Route("v1/customers/{id}/orders")]
+        public IEnumerable<ListCustomerOrdersQueryResult> GetOrders(Guid id)
+        {
+            return _customerRepository.GetOrders(id);
         }
 
         [HttpPost]
-        [Route("customers")]
-        public Customer Post([FromBody]CreateCustomerCommand command)
+        [Route("v1/customers")]
+        public ICommandResult Post([FromBody]CreateCustomerCommand command)
         {
-            var name = new Name(command.FirstName, command.LastName);
-            var document = new Document(command.Document);
-            var email = new Email(command.Email);
-
-            var customer = new Customer(name, document, email, command.Phone);
-
-            return customer;
-        }
-
-        [HttpPut]
-        [Route("customers")]
-        public Customer Put([FromBody]CreateCustomerCommand command)
-        {
-            var name = new Name(command.FirstName, command.LastName);
-            var document = new Document(command.Document);
-            var email = new Email(command.Email);
-
-            var customer = new Customer(name, document, email, command.Phone);
-
-            return customer;
-        }
-
-        [HttpDelete]
-        [Route("customers/{id}")]
-        public object Delete([FromBody]Customer customer)
-        {
-            return new { message = "Cliente removido com sucesso" };
+            var result = (CreateCustomerCommandResult)_handler.Handle(command);
+            return result;
         }
     }
 }
